@@ -17,6 +17,7 @@ public:
   Display display = Display::Flex;
   VecticalAlignment verticalAlignment = VecticalAlignment::Top;
   HorizontalAlignment horizontalAlignment = HorizontalAlignment::Left;
+  AlignDirection alignDirection = AlignDirection::Row;
 
   int topMargin = 0;
   int rightMargin = 0;

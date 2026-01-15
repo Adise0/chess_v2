@@ -30,7 +30,15 @@ public:
 
   SDL_FRect GetRect();
 
+  short GetSiblingIndex();
+  void SetSiblingIndex(short newIndex);
+
 private:
+  short GetChildIndex(Element *child);
+  void SetChildIndex(Element *child, short newIndex);
+
+  int GetLeftOffset();
+  int GetTopOffset();
   std::unique_ptr<Element> RemoveChild(Element *child);
 
   SDL_Color &GetDrawColor();

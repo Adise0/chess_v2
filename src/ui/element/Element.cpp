@@ -2,6 +2,7 @@
 #include "../../windowManager/WindowManager.h"
 #include <algorithm>
 #include <iostream>
+#include <string>
 namespace Chess::Rendering {
 
 Element &Element::GetRoot() {
@@ -105,5 +106,80 @@ std::vector<Element *> Element::GetRenderElements() {
       [](const Element *a, const Element *b) { return a->styles.zIndex > b->styles.zIndex; });
 
   return elementsToRender;
+}
+
+short Element::GetChildIndex(Element *child) {
+  if (!child) return;
+
+  auto it =
+      std::find_if(children.begin(), children.end(),
+                   [&](const std::unique_ptr<Element> &sibling) { return sibling.get() == child; });
+
+  if (it == children.end()) return -1;
+
+  return (short)(std::distance(children.begin(), it));
+}
+
+
+short Element::GetSiblingIndex() {
+  if (!parent) throw std::runtime_error("Cannot call GetSiblingIndex on root");
+  return parent->GetChildIndex(this);
+}
+void Element::SetSiblingIndex(short index) {
+  if (!parent) return;
+  parent->SetChildIndex(this, index);
+}
+
+void Element::SetChildIndex(Element *child, short newIndex) {
+  if (!child) return;
+  if (newIndex < 0 || newIndex >= children.size()) {
+    throw std::runtime_error("Cannot set child " + child->id + " to index " +
+                             std::to_string(newIndex) + ". Index out of range.");
+  }
+
+  short oldIndex = GetChildIndex(child);
+
+  auto replacedChild = std::move(children[newIndex]);
+  auto childToMove = std::move(children[oldIndex]);
+
+  children[newIndex] = nullptr;
+  children[oldIndex] = nullptr;
+
+  children[newIndex] = std::move(childToMove);
+  children[oldIndex] = std::move(replacedChild);
+}
+
+int Element::GetLeftOffset(Element *child) {
+  if (!parent) throw std::runtime_error("Can't call GetTopOffset on root element");
+
+  short index = parent->GetChildIndex(child);
+  if (parent->styles.alignDirection == AlignDirection::Column) return 0;
+  short offset = 0;
+  for (short i = 0; i < index; i++) {
+    Element *sibling = parent->children[i].get();
+    if (sibling->styles.position == Position::Absolute) continue;
+    offset += sibling->styles.leftMargin;
+    offset += sibling->styles.width;
+    offset += sibling->styles.rightMargin;
+  }
+
+  return offset;
+}
+
+int Element::GetTopOffset(Element *child) {
+  if (!parent) throw std::runtime_error("Can't call GetTopOffset on root element");
+
+  short index = parent->GetChildIndex(child);
+  if (parent->styles.alignDirection == AlignDirection::Row) return 0;
+  short offset = 0;
+  for (short i = 0; i < index; i++) {
+    Element *sibling = parent->children[i].get();
+    if (sibling->styles.position == Position::Absolute) continue;
+    offset += sibling->styles.topMargin;
+    offset += sibling->styles.height;
+    offset += sibling->styles.bottomMargin;
+  }
+
+  return offset;
 }
 } // namespace Chess::Rendering
