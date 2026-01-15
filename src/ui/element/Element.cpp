@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <windows.h>
 namespace Chess::Rendering {
 
 Element &Element::GetRoot() {
@@ -15,12 +16,13 @@ Element::Element(std::string id) : id(id) {}
 Element::~Element() {}
 
 Element *Element::CreateChild(std::string id) {
+  // #region CreateChild
   auto child = std::make_unique<Element>(std::move(id));
   Element *raw = child.get();
   AppendChild(std::move(child));
   return raw;
+  // #endregion
 }
-
 
 void Element::AppendChild(std::unique_ptr<Element> child) {
   // #region AppendChild
@@ -56,6 +58,7 @@ std::unique_ptr<Element> Element::RemoveChild(Element *child) {
 
 void Element::Render() {
   // #region Render
+  if (styles.display == Display::None) return;
 
   SDL_Color &color = GetDrawColor();
   SDL_SetRenderDrawColor(WindowManager::renderer, color.r, color.g, color.b, color.a);
@@ -74,27 +77,40 @@ void Element::Render() {
 }
 
 SDL_FRect Element::GetRect() {
-  float x = 0;
-  float y = 0;
+  // #region GetRect
 
-  if (parent) {
-    x += parent->GetRect().x;
-    y += parent->GetRect().y;
+  if (!parent) return {0, 0, (float)styles.width, (float)styles.height};
+
+  float x = parent->GetRect().x;
+  float y = parent->GetRect().y;
+
+
+  if (styles.position == Position::Relative) {
+    x += GetLeftOffset(this);
+    y += GetTopOffset(this);
   }
+  if (styles.position == Position::Relative) {
+    x += styles.left;
+    y += styles.top;
+  }
+
   return {x, y, (float)styles.width, (float)styles.height};
+  // #endregion
 }
 
 SDL_Color &Element::GetDrawColor() {
+  // #region GetDrawColor
   if (isActive && styles.activeColor) return *styles.activeColor;
   if (isHovered && styles.hoverColor) return *styles.hoverColor;
   return styles.backgroundColor;
+  // #endregion
 }
 
 SDL_Texture *Element::GetTexture() { return styles.backgroundImage; }
 
 
 std::vector<Element *> Element::GetRenderElements() {
-
+  // #region GetRenderElements
   std::vector<Element *> elementsToRender;
   for (short i = 0; i < children.size(); i++) {
     if (children[i]->styles.display == Display::None) continue;
@@ -106,31 +122,37 @@ std::vector<Element *> Element::GetRenderElements() {
       [](const Element *a, const Element *b) { return a->styles.zIndex > b->styles.zIndex; });
 
   return elementsToRender;
+  // #endregion
 }
 
 short Element::GetChildIndex(Element *child) {
-  if (!child) return;
+  // #region GetChildIndex
+  if (!child) throw std::runtime_error("Unknown child");
 
   auto it =
       std::find_if(children.begin(), children.end(),
                    [&](const std::unique_ptr<Element> &sibling) { return sibling.get() == child; });
 
-  if (it == children.end()) return -1;
-
+  if (it == children.end()) throw std::runtime_error("Unknown child");
   return (short)(std::distance(children.begin(), it));
+  // #endregion
 }
-
 
 short Element::GetSiblingIndex() {
+  // #region GetSiblingIndex
   if (!parent) throw std::runtime_error("Cannot call GetSiblingIndex on root");
   return parent->GetChildIndex(this);
+  // #endregion
 }
 void Element::SetSiblingIndex(short index) {
+  // #region SetSiblingIndex
   if (!parent) return;
   parent->SetChildIndex(this, index);
+  // #endregion
 }
 
 void Element::SetChildIndex(Element *child, short newIndex) {
+  // #region SetChildIndex
   if (!child) return;
   if (newIndex < 0 || newIndex >= children.size()) {
     throw std::runtime_error("Cannot set child " + child->id + " to index " +
@@ -147,9 +169,11 @@ void Element::SetChildIndex(Element *child, short newIndex) {
 
   children[newIndex] = std::move(childToMove);
   children[oldIndex] = std::move(replacedChild);
+  // #endregion
 }
 
 int Element::GetLeftOffset(Element *child) {
+  // #region GetLeftOffset
   if (!parent) throw std::runtime_error("Can't call GetTopOffset on root element");
 
   short index = parent->GetChildIndex(child);
@@ -164,9 +188,11 @@ int Element::GetLeftOffset(Element *child) {
   }
 
   return offset;
+  // #endregion
 }
 
 int Element::GetTopOffset(Element *child) {
+  // #region GetTopOffset
   if (!parent) throw std::runtime_error("Can't call GetTopOffset on root element");
 
   short index = parent->GetChildIndex(child);
@@ -181,5 +207,6 @@ int Element::GetTopOffset(Element *child) {
   }
 
   return offset;
+  // #endregion
 }
 } // namespace Chess::Rendering

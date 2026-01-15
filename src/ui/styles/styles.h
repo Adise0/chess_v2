@@ -15,7 +15,7 @@ public:
   SDL_Texture *backgroundImage = nullptr;
 
   Display display = Display::Flex;
-  VecticalAlignment verticalAlignment = VecticalAlignment::Top;
+  VerticalAlignment verticalAlignment = VerticalAlignment::Top;
   HorizontalAlignment horizontalAlignment = HorizontalAlignment::Left;
   AlignDirection alignDirection = AlignDirection::Row;
 
@@ -31,11 +31,11 @@ public:
 
   float zIndex = 0;
 
-  int height = 0;
+  int height = -1;
   int width = -1;
 
-  int top = -1;
-  int left = -1;
+  int top = 0;
+  int left = 0;
 
   float scale;
 };

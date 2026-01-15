@@ -2,15 +2,16 @@
 #include "../ui/element/Element.h"
 #include "../windowManager/WindowManager.h"
 #include <chrono>
+#include <iostream>
+#include <string>
 
 namespace Chess {
 
 using namespace Rendering;
 
-
 bool GameManager::isRunning = false;
 float GameManager::deltaTime = 0;
-
+MainMenu GameManager::mainMenu = MainMenu();
 
 void GameManager::Run() {
   // #region Run
@@ -18,15 +19,9 @@ void GameManager::Run() {
   SDL_Event event;
   auto lastFrame = std::chrono::high_resolution_clock::now();
 
-  Element *testElement = Element::GetRoot().CreateChild("test elm");
-  testElement->styles.width = 100;
-  testElement->styles.height = 500;
-  testElement->styles.backgroundColor = {255, 255, 255, 255};
 
-  Element *testElement2 = Element::GetRoot().CreateChild("test elm2");
-  testElement2->styles.width = 150;
-  testElement2->styles.height = 50;
-  testElement2->styles.backgroundColor = {0, 0, 255, 255};
+  // mainMenu.Show();
+
 
   while (isRunning) {
     auto thisFrame = std::chrono::high_resolution_clock::now();
