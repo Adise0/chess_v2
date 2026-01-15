@@ -14,7 +14,6 @@ const short WindowManager::resolutionX = 1280;
 const short WindowManager::resolutionY = 800;
 
 
-
 void WindowManager::InitializeWindow() {
   // #region InitializeWindow
   if (!SDL_Init(SDL_INIT_VIDEO))

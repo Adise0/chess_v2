@@ -1,4 +1,5 @@
 
+#include "gameManager/GameManager.h"
 #include "windowManager/WindowManager.h"
 #include <iostream>
 #include <windows.h>
@@ -10,8 +11,8 @@ int Run() {
   WindowManager::InitializeWindow();
 
 
-  // GameManager::Run();
   std::cout << "Running! \n";
+  GameManager::Run();
   SDL_Quit();
   WindowManager::Dispose();
   return EXIT_SUCCESS;
