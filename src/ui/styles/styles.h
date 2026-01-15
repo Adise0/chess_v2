@@ -1,30 +1,32 @@
 #pragma once
+#include "../../types/Vector2.h"
 #include "types.h"
 #include <SDL3/SDL.h>
-
 namespace Chess::Rendering {
 using namespace Types;
 
 struct Styles {
 public:
-  SDL_Color backgroundColor;
-  SDL_Color hoverColor;
-  SDL_Color activeColor;
+  Position position = Position::Relative;
 
-  SDL_Texture *backgroundImage;
+  SDL_Color backgroundColor{0, 0, 0, 255};
+  SDL_Color hoverColor{-1, -1, -1, -1};
+  SDL_Color activeColor{-1, -1, -1, -1};
 
-  Display display;
-  Alignment verticalAlignment;
-  Alignment horizontalAlignment;
+  SDL_Texture *backgroundImage = nullptr;
 
-  int topMargin;
-  int rightMargin;
-  int bottomMargin;
-  int leftMargin;
+  Display display = Display::Flex;
+  VecticalAlignment verticalAlignment = VecticalAlignment::Top;
+  HorizontalAlignment horizontalAlignment = HorizontalAlignment::Left;
 
-  int topPadding;
-  int rightPadding;
-  int bottomPadding;
-  int leftPadding;
+  int topMargin = 0;
+  int rightMargin = 0;
+  int bottomMargin = 0;
+  int leftMargin = 0;
+
+  int topPadding = 0;
+  int rightPadding = 0;
+  int bottomPadding = 0;
+  int leftPadding = 0;
 };
 } // namespace Chess::Rendering
