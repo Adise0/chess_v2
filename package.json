@@ -1,0 +1,24 @@
+{
+  "name": "cpp",
+  "version": "1.0.0",
+  "description": "This rrepo contains a ccpp project template for VSCode with a dev pipeline",
+  "main": "build.js",
+  "scripts": {
+    "dev": "setupEnv.bat && nodemon -q .",
+    "build": "setupEnv.bat && build.bat"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adise0/cpp-template.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Adise0/cpp-template/issues"
+  },
+  "homepage": "https://github.com/Adise0/cpp-template#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
