@@ -1,4 +1,5 @@
 #include "GameManager.h"
+#include "../ui/element/Element.h"
 #include "../windowManager/WindowManager.h"
 #include <chrono>
 
@@ -17,9 +18,17 @@ void GameManager::Run() {
   SDL_Event event;
   auto lastFrame = std::chrono::high_resolution_clock::now();
 
+  Element *testElement = Element::GetRoot().CreateChild("test elm");
+  testElement->styles.width = 100;
+  testElement->styles.height = 500;
+  testElement->styles.backgroundColor = {255, 255, 255, 255};
+
+  Element *testElement2 = Element::GetRoot().CreateChild("test elm2");
+  testElement2->styles.width = 150;
+  testElement2->styles.height = 50;
+  testElement2->styles.backgroundColor = {0, 0, 255, 255};
 
   while (isRunning) {
-    // ProcessInput(event);
     auto thisFrame = std::chrono::high_resolution_clock::now();
     deltaTime = std::chrono::duration<float>(thisFrame - lastFrame).count();
     lastFrame = thisFrame;
@@ -58,7 +67,11 @@ void GameManager::Update() {
 
 void GameManager::Render() {
   // #region Render
+  SDL_SetRenderDrawColor(WindowManager::renderer, 0, 0, 0, 255);
   SDL_RenderClear(WindowManager::renderer);
+
+
+  Element::GetRoot().Render();
 
   SDL_RenderPresent(WindowManager::renderer);
   // #endregion

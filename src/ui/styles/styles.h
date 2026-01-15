@@ -8,10 +8,9 @@ using namespace Types;
 struct Styles {
 public:
   Position position = Position::Relative;
-
-  SDL_Color backgroundColor{0, 0, 0, 255};
-  SDL_Color hoverColor{-1, -1, -1, -1};
-  SDL_Color activeColor{-1, -1, -1, -1};
+  SDL_Color backgroundColor = {0, 0, 0, 0};
+  SDL_Color *hoverColor = nullptr;
+  SDL_Color *activeColor = nullptr;
 
   SDL_Texture *backgroundImage = nullptr;
 
@@ -29,10 +28,14 @@ public:
   int bottomPadding = 0;
   int leftPadding = 0;
 
+  float zIndex = 0;
+
   int height = 0;
   int width = -1;
 
   int top = -1;
   int left = -1;
+
+  float scale;
 };
 } // namespace Chess::Rendering

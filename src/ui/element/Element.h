@@ -16,17 +16,26 @@ public:
   std::vector<std::unique_ptr<Element>> children;
   Element *parent = nullptr;
 
+  bool isHovered = false;
+  bool isActive = false;
+
 public:
   Element(std::string id);
-  Element(std::string id, Element *parent);
   ~Element();
 
 
   void Render();
   void AppendChild(std::unique_ptr<Element> child);
+  Element *CreateChild(std::string id);
+
+  SDL_FRect GetRect();
 
 private:
   std::unique_ptr<Element> RemoveChild(Element *child);
+
+  SDL_Color &GetDrawColor();
+  SDL_Texture *GetTexture();
+  std::vector<Element *> GetRenderElements();
 };
 
 
