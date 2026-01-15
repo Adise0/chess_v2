@@ -4,3 +4,5 @@ build
 app.pid
 *.pdb
 tmp
+
+setupEnv.bat

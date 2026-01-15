@@ -3,9 +3,9 @@ import path from "path";
 import crypto from "crypto";
 import { execSync } from "child_process";
 
-const cachePath = "./build/cache/app.cache";
+const cachePath = "./build/cache/chess.cache";
 const srcPath = "./src";
-const appPath = "./build/app.exe";
+const appPath = "./build/chess.exe";
 
 const getFileHash = (filePath) => {
   const fileBuffer = fs.readFileSync(filePath);
@@ -65,9 +65,9 @@ filesToCompile = filesToCompile.filter((filePath) => !filePath.endsWith(".h"));
 
 if (filesToCompile.length != 0) {
   execSync(
-    `cl.exe /Zi /Od /EHsc /nologo /Fobuild/objects/ /std:c++17 /Fdbuild/compiler.pdb ${filesToCompile.join(
+    `cl.exe /Zi /Od /EHsc /nologo /I"lib/include" /std:c++17 /Fobuild/objects/ /Fdbuild/compiler.pdb ${filesToCompile.join(
       " "
-    )} /c`,
+    )} /c `,
     {
       stdio: "inherit",
       shell: true,
@@ -75,7 +75,7 @@ if (filesToCompile.length != 0) {
   );
 
   execSync(
-    `link.exe /OUT:"build/app.exe" /DEBUG /PDB:"build/app.pdb" build/objects/*.obj user32.lib`,
+    `link.exe /OUT:"build/chess.exe" /DEBUG /PDB:"build/chess.pdb" build/objects/*.obj SDL3.lib SDL3_image.lib User32.lib /LIBPATH:"lib/SDL3" /SUBSYSTEM:WINDOWS`,
     {
       stdio: "inherit",
       shell: true,
