@@ -28,5 +28,11 @@ public:
   int rightPadding = 0;
   int bottomPadding = 0;
   int leftPadding = 0;
+
+  int height = 0;
+  int width = -1;
+
+  int top = -1;
+  int left = -1;
 };
 } // namespace Chess::Rendering

@@ -23,9 +23,10 @@ public:
 
 
   void Render();
-
   void AppendChild(std::unique_ptr<Element> child);
-  void SetParent(Element *parent);
+
+private:
+  std::unique_ptr<Element> RemoveChild(Element *child);
 };
 
 
