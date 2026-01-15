@@ -58,7 +58,6 @@ void GameManager::Update() {
 
 void GameManager::Render() {
   // #region Render
-  SDL_SetRenderDrawColor(WindowManager::renderer, 10, 200, 200, 255);
   SDL_RenderClear(WindowManager::renderer);
 
   SDL_RenderPresent(WindowManager::renderer);
