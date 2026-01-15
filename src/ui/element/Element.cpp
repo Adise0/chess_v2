@@ -7,8 +7,10 @@
 namespace Chess::Rendering {
 
 Element &Element::GetRoot() {
+  // #region GetRoot
   static Element root("root");
   return root;
+  // #endregion
 }
 
 Element::Element(std::string id) : id(id) {}
@@ -78,30 +80,71 @@ void Element::Render() {
 
 SDL_FRect Element::GetRect() {
   // #region GetRect
+  float width = GetWidth();
+  float height = GetHeight();
+  // std::cout << id << " has parent " << !!parent << std::endl;
 
-  if (!parent) return {0, 0, (float)styles.width, (float)styles.height};
+  if (!parent) return {0, 0, width, height};
 
   float x = parent->GetRect().x;
   float y = parent->GetRect().y;
 
 
   if (styles.position == Position::Relative) {
+
     x += GetLeftOffset(this);
     y += GetTopOffset(this);
+
+    x += parent->styles.leftPadding;
+    y += parent->styles.topPadding;
+    x += styles.leftMargin;
+    y += styles.topMargin;
+
+    if (parent->styles.horizontalAlignment == HorizontalAlignment::Center) {
+      float parentWidth = parent->GetWidth();
+      x += (parentWidth / 2) - (width / 2);
+    }
+    if (parent->styles.verticalAlignment == VerticalAlignment::Center) {
+      float parentHeight = parent->GetHeight();
+      y += (parentHeight / 2) - (height / 2);
+    }
   }
-  if (styles.position == Position::Relative) {
+  if (styles.position == Position::Absolute) {
     x += styles.left;
     y += styles.top;
   }
+  // std::cout << id << x << ", " << y << ", " << width << ", " << height << std::endl;
+  return {x, y, width, height};
+  // #endregion
+}
 
-  return {x, y, (float)styles.width, (float)styles.height};
+float Element::GetWidth() {
+  // #region GetWidth
+  if (!parent) return WindowManager::resolutionX;
+  float width = styles.width;
+  if (width == -1) width = parent->GetWidth();
+
+  // width -= parent->styles.leftPadding + parent->styles.rightPadding;
+  // width -= styles.leftMargin + styles.rightMargin;
+  return width;
+  // #endregion
+}
+
+float Element::GetHeight() {
+  // #region GetHeight
+  if (!parent) return WindowManager::resolutionY;
+  float height = styles.height;
+  if (height == -1) height = parent->GetHeight();
+
+  // height -= parent->styles.topPadding + parent->styles.bottomPadding;
+  // height -= styles.topMargin + styles.bottomMargin;
+
+  return height;
   // #endregion
 }
 
 SDL_Color &Element::GetDrawColor() {
   // #region GetDrawColor
-  if (isActive && styles.activeColor) return *styles.activeColor;
-  if (isHovered && styles.hoverColor) return *styles.hoverColor;
   return styles.backgroundColor;
   // #endregion
 }
@@ -144,6 +187,7 @@ short Element::GetSiblingIndex() {
   return parent->GetChildIndex(this);
   // #endregion
 }
+
 void Element::SetSiblingIndex(short index) {
   // #region SetSiblingIndex
   if (!parent) return;
@@ -207,6 +251,52 @@ int Element::GetTopOffset(Element *child) {
   }
 
   return offset;
+  // #endregion
+}
+
+void Element::HandleEvent(SDL_Event &sdlEvent, Event &event) {
+  // #region HandleEvent
+  if (event.stopPropagation) return;
+  if (sdlEvent.button.x >= GetRect().x && sdlEvent.button.x <= GetRect().x + GetWidth() &&
+      sdlEvent.button.y >= GetRect().y && sdlEvent.button.y <= GetRect().y + GetHeight()) {
+    if (!isHovered) {
+      isHovered = true;
+      OnHoverHandler(event);
+    }
+  } else if (isHovered) isHovered = false;
+
+  for (short i = 0; i < children.size(); i++) {
+    children[i]->HandleEvent(sdlEvent, event);
+  }
+
+  // #endregion
+}
+
+void Element::OnClick(std::function<void(Event &event)> listener) {
+  // #region OnClick
+  onClickListeners.push_back(listener);
+  // #endregion
+}
+
+void Element::OnHover(std::function<void(Event &event)> listener) {
+  // #region OnClick
+  onHoverListeners.push_back(listener);
+  // #endregion
+}
+
+void Element::OnClickHandler(Event &event) {
+  // #region OnClickHandler
+  for (std::function<void(Event &event)> listener : onClickListeners) {
+    listener(event);
+  }
+  // #endregion
+}
+
+void Element::OnHoverHandler(Event &event) {
+  // #region OnHoverHandler
+  for (std::function<void(Event &event)> listener : onHoverListeners) {
+    listener(event);
+  }
   // #endregion
 }
 } // namespace Chess::Rendering

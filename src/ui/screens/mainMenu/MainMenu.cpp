@@ -4,8 +4,10 @@ namespace Chess::Rendering::Screens {
 MainMenu::MainMenu() : Screen() {
   root = Element::GetRoot().CreateChild("MainMenu");
   root->styles.display = Display::None;
+
   root->styles.verticalAlignment = VerticalAlignment::Center;
   root->styles.horizontalAlignment = HorizontalAlignment::Center;
+
   Element *background = root->CreateChild("Background");
   background->styles.backgroundColor = {255, 255, 255, 255};
   background->styles.position = Position::Absolute;

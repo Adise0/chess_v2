@@ -20,7 +20,7 @@ void GameManager::Run() {
   auto lastFrame = std::chrono::high_resolution_clock::now();
 
 
-  // mainMenu.Show();
+  mainMenu.Show();
 
 
   while (isRunning) {
@@ -46,6 +46,7 @@ void GameManager::ProcessEvent(SDL_Event &event) {
       break;
 
     default:
+      Element::GetRoot().HandleEvent(event);
       break;
     }
   }

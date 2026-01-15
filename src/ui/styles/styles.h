@@ -9,8 +9,6 @@ struct Styles {
 public:
   Position position = Position::Relative;
   SDL_Color backgroundColor = {0, 0, 0, 0};
-  SDL_Color *hoverColor = nullptr;
-  SDL_Color *activeColor = nullptr;
 
   SDL_Texture *backgroundImage = nullptr;
 
