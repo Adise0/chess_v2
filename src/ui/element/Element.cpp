@@ -80,68 +80,12 @@ void Element::Render() {
 
 SDL_FRect Element::GetRect() {
   // #region GetRect
-  float width = GetWidth();
-  float height = GetHeight();
-  // std::cout << id << " has parent " << !!parent << std::endl;
+  if (!parent) return {0, 0, (float)WindowManager::resolutionX, (float)WindowManager::resolutionY};
 
-  if (!parent) return {0, 0, width, height};
-
-  float x = parent->GetRect().x;
-  float y = parent->GetRect().y;
-
-
-  if (styles.position == Position::Relative) {
-
-    x += GetLeftOffset(this);
-    y += GetTopOffset(this);
-
-    x += parent->styles.leftPadding;
-    y += parent->styles.topPadding;
-    x += styles.leftMargin;
-    y += styles.topMargin;
-
-    if (parent->styles.horizontalAlignment == HorizontalAlignment::Center) {
-      float parentWidth = parent->GetWidth();
-      x += (parentWidth / 2) - (width / 2);
-    }
-    if (parent->styles.verticalAlignment == VerticalAlignment::Center) {
-      float parentHeight = parent->GetHeight();
-      y += (parentHeight / 2) - (height / 2);
-    }
-  }
-  if (styles.position == Position::Absolute) {
-    x += styles.left;
-    y += styles.top;
-  }
-  // std::cout << id << x << ", " << y << ", " << width << ", " << height << std::endl;
-  return {x, y, width, height};
+  return parent->GetChildRect(this);
   // #endregion
 }
 
-float Element::GetWidth() {
-  // #region GetWidth
-  if (!parent) return WindowManager::resolutionX;
-  float width = styles.width;
-  if (width == -1) width = parent->GetWidth();
-
-  // width -= parent->styles.leftPadding + parent->styles.rightPadding;
-  // width -= styles.leftMargin + styles.rightMargin;
-  return width;
-  // #endregion
-}
-
-float Element::GetHeight() {
-  // #region GetHeight
-  if (!parent) return WindowManager::resolutionY;
-  float height = styles.height;
-  if (height == -1) height = parent->GetHeight();
-
-  // height -= parent->styles.topPadding + parent->styles.bottomPadding;
-  // height -= styles.topMargin + styles.bottomMargin;
-
-  return height;
-  // #endregion
-}
 
 SDL_Color &Element::GetDrawColor() {
   // #region GetDrawColor
@@ -216,58 +160,65 @@ void Element::SetChildIndex(Element *child, short newIndex) {
   // #endregion
 }
 
-int Element::GetLeftOffset(Element *child) {
-  // #region GetLeftOffset
-  if (!parent) throw std::runtime_error("Can't call GetTopOffset on root element");
-
-  short index = parent->GetChildIndex(child);
-  if (parent->styles.alignDirection == AlignDirection::Column) return 0;
-  short offset = 0;
-  for (short i = 0; i < index; i++) {
-    Element *sibling = parent->children[i].get();
-    if (sibling->styles.position == Position::Absolute) continue;
-    offset += sibling->styles.leftMargin;
-    offset += sibling->styles.width;
-    offset += sibling->styles.rightMargin;
-  }
-
-  return offset;
+bool Element::IsWithinRect(Vector2 position) {
+  // #region IsWithinRect
+  SDL_FRect rect = GetRect();
+  return position.x >= rect.x && position.x <= rect.x + rect.w && position.y >= rect.y &&
+         position.y <= rect.y + rect.h;
   // #endregion
 }
 
-int Element::GetTopOffset(Element *child) {
-  // #region GetTopOffset
-  if (!parent) throw std::runtime_error("Can't call GetTopOffset on root element");
+Element *Element::GetRelativeParent() {
+  if (!parent || styles.position == Position::Relative) return this;
+  return parent->GetRelativeParent();
+}
 
-  short index = parent->GetChildIndex(child);
-  if (parent->styles.alignDirection == AlignDirection::Row) return 0;
-  short offset = 0;
-  for (short i = 0; i < index; i++) {
-    Element *sibling = parent->children[i].get();
-    if (sibling->styles.position == Position::Absolute) continue;
-    offset += sibling->styles.topMargin;
-    offset += sibling->styles.height;
-    offset += sibling->styles.bottomMargin;
+SDL_FRect Element::GetChildRect(Element *child) {
+  // #region GetChildRect
+  SDL_FRect myRect = GetRect();
+  SDL_FRect childRect = {myRect.x, myRect.y, 0, 0};
+  short childIndex = GetChildIndex(child);
+
+  if (child->styles.position == Position::Absolute) {
+    SDL_FRect relativeParentRect = GetRelativeParent()->GetRect();
+
+    childRect.x = relativeParentRect.x + styles.left + styles.leftMargin;
+    childRect.y = relativeParentRect.y + styles.top + styles.topMargin;
+
+    int width = child->styles.width;
+    width == -1 ? width = relativeParentRect.w : width;
+
+    int height = child->styles.height;
+    height == -1 ? height = relativeParentRect.h : height;
+
+    return childRect;
   }
 
-  return offset;
+  for (size_t i = 0; i < children.size(); i++) {
+  }
+
+
+  return childRect;
   // #endregion
 }
 
 void Element::HandleEvent(SDL_Event &sdlEvent, Event &event) {
   // #region HandleEvent
+
+
   if (event.stopPropagation) return;
-  if (sdlEvent.button.x >= GetRect().x && sdlEvent.button.x <= GetRect().x + GetWidth() &&
-      sdlEvent.button.y >= GetRect().y && sdlEvent.button.y <= GetRect().y + GetHeight()) {
+  for (short i = 0; i < children.size(); i++) {
+    children[i]->HandleEvent(sdlEvent, event);
+  }
+  Vector2 mousePos(sdlEvent.motion.x, sdlEvent.motion.y);
+
+  if (IsWithinRect(mousePos) && !isHovered) {
     if (!isHovered) {
       isHovered = true;
       OnHoverHandler(event);
     }
   } else if (isHovered) isHovered = false;
 
-  for (short i = 0; i < children.size(); i++) {
-    children[i]->HandleEvent(sdlEvent, event);
-  }
 
   // #endregion
 }

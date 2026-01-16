@@ -36,6 +36,7 @@ public:
   Element *CreateChild(std::string id);
 
   SDL_FRect GetRect();
+  SDL_FRect GetChildRect(Element *child);
 
   short GetSiblingIndex();
   void SetSiblingIndex(short newIndex);
@@ -63,6 +64,10 @@ private:
 
   void OnHoverHandler(Event &event);
   void OnClickHandler(Event &event);
+
+  bool IsWithinRect(Vector2 position);
+
+  Element *GetRelativeParent();
 };
 
 
