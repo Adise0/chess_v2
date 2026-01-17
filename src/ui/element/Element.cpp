@@ -62,11 +62,11 @@ void Element::Render() {
   // #region Render
   if (styles.display == Display::None) return;
 
-  SDL_Color &color = GetDrawColor();
+  SDL_Color &color = styles.backgroundColor;
   SDL_SetRenderDrawColor(WindowManager::renderer, color.r, color.g, color.b, color.a);
   SDL_RenderFillRect(WindowManager::renderer, &GetRect());
 
-  SDL_Texture *texture = GetTexture();
+  SDL_Texture *texture = styles.backgroundImage;
   if (texture) SDL_RenderTexture(WindowManager::renderer, texture, NULL, &GetRect());
 
   std::vector<Element *> elements = GetRenderElements();
@@ -85,16 +85,6 @@ SDL_FRect Element::GetRect() {
   return parent->GetChildRect(this);
   // #endregion
 }
-
-
-SDL_Color &Element::GetDrawColor() {
-  // #region GetDrawColor
-  return styles.backgroundColor;
-  // #endregion
-}
-
-SDL_Texture *Element::GetTexture() { return styles.backgroundImage; }
-
 
 std::vector<Element *> Element::GetRenderElements() {
   // #region GetRenderElements
@@ -169,8 +159,10 @@ bool Element::IsWithinRect(Vector2 position) {
 }
 
 Element *Element::GetRelativeParent() {
+  // #region GetRelativeParent
   if (!parent || styles.position == Position::Relative) return this;
   return parent->GetRelativeParent();
+  // #endregion
 }
 
 SDL_FRect Element::GetChildRect(Element *child) {
@@ -182,14 +174,14 @@ SDL_FRect Element::GetChildRect(Element *child) {
   if (child->styles.position == Position::Absolute) {
     SDL_FRect relativeParentRect = GetRelativeParent()->GetRect();
 
-    childRect.x = relativeParentRect.x + styles.left + styles.leftMargin;
-    childRect.y = relativeParentRect.y + styles.top + styles.topMargin;
+    // childRect.x = relativeParentRect.x + styles.left + styles.leftMargin;
+    // childRect.y = relativeParentRect.y + styles.top + styles.topMargin;
 
-    int width = child->styles.width;
-    width == -1 ? width = relativeParentRect.w : width;
+    // int width = child->styles.width;
+    // width == -1 ? width = relativeParentRect.w : width;
 
-    int height = child->styles.height;
-    height == -1 ? height = relativeParentRect.h : height;
+    // int height = child->styles.height;
+    // height == -1 ? height = relativeParentRect.h : height;
 
     return childRect;
   }
@@ -202,52 +194,15 @@ SDL_FRect Element::GetChildRect(Element *child) {
   // #endregion
 }
 
-void Element::HandleEvent(SDL_Event &sdlEvent, Event &event) {
+void Element::HandleEvent(Event &event) {
   // #region HandleEvent
-
-
   if (event.stopPropagation) return;
   for (short i = 0; i < children.size(); i++) {
-    children[i]->HandleEvent(sdlEvent, event);
+    children[i]->HandleEvent(event);
   }
-  Vector2 mousePos(sdlEvent.motion.x, sdlEvent.motion.y);
+  if (event.stopPropagation) return;
 
-  if (IsWithinRect(mousePos) && !isHovered) {
-    if (!isHovered) {
-      isHovered = true;
-      OnHoverHandler(event);
-    }
-  } else if (isHovered) isHovered = false;
-
-
-  // #endregion
-}
-
-void Element::OnClick(std::function<void(Event &event)> listener) {
-  // #region OnClick
-  onClickListeners.push_back(listener);
-  // #endregion
-}
-
-void Element::OnHover(std::function<void(Event &event)> listener) {
-  // #region OnClick
-  onHoverListeners.push_back(listener);
-  // #endregion
-}
-
-void Element::OnClickHandler(Event &event) {
-  // #region OnClickHandler
-  for (std::function<void(Event &event)> listener : onClickListeners) {
-    listener(event);
-  }
-  // #endregion
-}
-
-void Element::OnHoverHandler(Event &event) {
-  // #region OnHoverHandler
-  for (std::function<void(Event &event)> listener : onHoverListeners) {
-    listener(event);
-  }
+  eventHandler.HandleEvent(event);
   // #endregion
 }
 } // namespace Chess::Rendering

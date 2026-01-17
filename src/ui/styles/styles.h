@@ -2,38 +2,40 @@
 #include "../../types/Vector2.h"
 #include "types.h"
 #include <SDL3/SDL.h>
+#include <string>
 namespace Chess::Rendering {
 using namespace Types;
 
 struct Styles {
 public:
-  Position position = Position::Relative;
+  Position position = Position::Static;
   SDL_Color backgroundColor = {0, 0, 0, 0};
 
   SDL_Texture *backgroundImage = nullptr;
 
-  Display display = Display::Flex;
+  Display display = Display::Block;
   VerticalAlignment verticalAlignment = VerticalAlignment::Top;
   HorizontalAlignment horizontalAlignment = HorizontalAlignment::Left;
-  AlignDirection alignDirection = AlignDirection::Row;
+  FlexDirection flexDirection = FlexDirection::Row;
+  int gap = 0;
 
-  int topMargin = 0;
-  int rightMargin = 0;
-  int bottomMargin = 0;
-  int leftMargin = 0;
+  std::string topMargin = "";
+  std::string rightMargin = "";
+  std::string bottomMargin = "";
+  std::string leftMargin = "";
 
-  int topPadding = 0;
-  int rightPadding = 0;
-  int bottomPadding = 0;
-  int leftPadding = 0;
+  std::string topPadding = "";
+  std::string rightPadding = "";
+  std::string bottomPadding = "";
+  std::string leftPadding = "";
 
   float zIndex = 0;
 
-  int height = -1;
-  int width = -1;
+  std::string height = "";
+  std::string width = "";
 
-  int top = 0;
-  int left = 0;
+  std::string top = "";
+  std::string left = "";
 
   float scale;
 };

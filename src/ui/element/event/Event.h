@@ -3,8 +3,12 @@
 #include <SDL3/SDL.h>
 namespace Chess::Rendering::Events {
 
+
+enum EventType { OnClick, OnMouseEnter, OnMouseLeave };
+
 struct Event {
 public:
+  EventType eventType;
   Vector2 mousePos;
   SDL_Event &sdlEvent;
   bool stopPropagation = false;

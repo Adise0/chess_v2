@@ -9,12 +9,16 @@
 namespace Chess::Rendering {
 using namespace Events;
 class Element {
+  // #region Static
 public:
   static Element &GetRoot();
+  // #endregion
 
+  // #region Data
 public:
   Styles styles;
   std::string id;
+  EventHandler eventHandler;
 
   std::vector<std::unique_ptr<Element>> children;
   Element *parent = nullptr;
@@ -22,15 +26,16 @@ public:
   bool isHovered = false;
   bool isActive = false;
 
-private:
-  std::vector<std::function<void(Event &event)>> onClickListeners;
-  std::vector<std::function<void(Event &event)>> onHoverListeners;
+  // #endregion
 
+  // #region Constructors
 public:
   Element(std::string id);
   ~Element();
+  // #endregion
 
-
+  // #region Methods
+public:
   void Render();
   void AppendChild(std::unique_ptr<Element> child);
   Element *CreateChild(std::string id);
@@ -41,12 +46,6 @@ public:
   short GetSiblingIndex();
   void SetSiblingIndex(short newIndex);
 
-  void OnClick(std::function<void(Event &event)> listener);
-  void OnHover(std::function<void(Event &event)> listener);
-
-  void HandleEvent(SDL_Event &sdlEvent, Event &event);
-
-
 private:
   short GetChildIndex(Element *child);
   void SetChildIndex(Element *child, short newIndex);
@@ -54,20 +53,17 @@ private:
   int GetLeftOffset(Element *child);
   int GetTopOffset(Element *child);
   std::unique_ptr<Element> RemoveChild(Element *child);
-
-  SDL_Color &GetDrawColor();
-  SDL_Texture *GetTexture();
   std::vector<Element *> GetRenderElements();
-
-  float GetHeight();
-  float GetWidth();
-
-  void OnHoverHandler(Event &event);
-  void OnClickHandler(Event &event);
-
   bool IsWithinRect(Vector2 position);
-
   Element *GetRelativeParent();
+
+  void HandleEvent(Event &event);
+  // #endregion
+
+  // #region Aliases
+public:
+  void On(EventType eventType, std::function<void(Event &event)> listener);
+  // #endregion
 };
 
 
