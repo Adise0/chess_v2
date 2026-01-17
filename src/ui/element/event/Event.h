@@ -4,7 +4,7 @@
 namespace Chess::Rendering::Events {
 
 
-enum EventType { OnClick, OnMouseEnter, OnMouseLeave };
+enum EventType { OnClick, OnMouseMove };
 
 struct Event {
 public:
@@ -12,5 +12,7 @@ public:
   Vector2 mousePos;
   SDL_Event &sdlEvent;
   bool stopPropagation = false;
+
+  Event();
 };
 } // namespace Chess::Rendering::Events

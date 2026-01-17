@@ -1,6 +1,7 @@
 #pragma once
 #include "../styles/styles.h"
 #include "event/Event.h"
+#include "eventHandler/EventHandler.h"
 #include <functional>
 #include <memory>
 #include <string>
@@ -46,6 +47,8 @@ public:
   short GetSiblingIndex();
   void SetSiblingIndex(short newIndex);
 
+  void HandleEvent(Event &event);
+
 private:
   short GetChildIndex(Element *child);
   void SetChildIndex(Element *child, short newIndex);
@@ -57,7 +60,7 @@ private:
   bool IsWithinRect(Vector2 position);
   Element *GetRelativeParent();
 
-  void HandleEvent(Event &event);
+
   // #endregion
 
   // #region Aliases

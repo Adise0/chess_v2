@@ -2,7 +2,10 @@
 #include "../../types/Vector2.h"
 #include "types.h"
 #include <SDL3/SDL.h>
+#include <stdexcept>
 #include <string>
+
+
 namespace Chess::Rendering {
 using namespace Types;
 

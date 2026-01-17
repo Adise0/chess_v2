@@ -36,17 +36,23 @@ void GameManager::Run() {
 }
 
 
-void GameManager::ProcessEvent(SDL_Event &event) {
+void GameManager::ProcessEvent(SDL_Event &sdlEvent) {
   // #region ProcessEvent
-  while (SDL_PollEvent(&event)) {
+  Event event;
 
-    switch (event.type) {
+  while (SDL_PollEvent(&sdlEvent)) {
+
+    switch (sdlEvent.type) {
     case SDL_EVENT_QUIT:
       isRunning = false;
       break;
 
-    default:
+    case SDL_EVENT_MOUSE_MOTION:
+      event.eventType = EventType::OnMouseMove;
       Element::GetRoot().HandleEvent(event);
+      break;
+
+    default:
       break;
     }
   }

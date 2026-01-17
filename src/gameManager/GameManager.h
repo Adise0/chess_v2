@@ -17,7 +17,7 @@ public:
   static void Run();
 
 private:
-  static void ProcessEvent(SDL_Event &event);
+  static void ProcessEvent(SDL_Event &sdlEvent);
   static void Update();
   static void Render();
 };
