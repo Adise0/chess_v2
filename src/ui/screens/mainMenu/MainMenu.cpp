@@ -4,18 +4,22 @@ namespace Chess::Rendering::Screens {
 MainMenu::MainMenu() : Screen() {
 
   Styles rootStyles{
-      .position = Position::Absolute,
       .display = Display::None,
       .width = "100vw",
       .height = "100vh",
+      .backgroundColor = {255, 255, 255, 255},
   };
   root = Element::GetRoot().CreateChild("MainMenu");
   root->styles = rootStyles;
 
 
-
-  // Element *playButton = root->CreateChild("PlayButton");
-  // playButton->styles.backgroundColor = {0, 0, 0, 255};
+  Styles buttonStyles{
+      .width = "100px",
+      .height = "30px",
+      .backgroundColor = {0, 0, 0, 255},
+  };
+  Element *playButton = root->CreateChild("PlayButton");
+  playButton->styles = buttonStyles;
   // playButton->styles.width = "defualt";
   // playButton->styles.height = 50;
 }

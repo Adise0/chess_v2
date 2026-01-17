@@ -33,11 +33,10 @@ int StyleParser::GetStyleValue(Element *element, std::string name) {
         return 0;
       }
       int parentValue = GetStyleValue(element->parent, name);
-      std::cout << "Percent detected!: " << amount << std::endl;
-      return (parentValue * (amount / 100));
+      return (parentValue * (amount / 100.0));
     }
-    if (matcher == "vw") return WindowManager::resolutionX;
-    if (matcher == "vh") return WindowManager::resolutionY;
+    if (matcher == "vw") return WindowManager::resolutionX * (amount / 100.0);
+    if (matcher == "vh") return WindowManager::resolutionY * (amount / 100.0);
     throw std::runtime_error("Unknown matcher: " + std::string(matcher));
   } catch (std::runtime_error e) {
     throw e;

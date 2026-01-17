@@ -11,18 +11,19 @@ using namespace Types;
 
 struct Styles {
 public:
-  Position position = Position::Static;
-  SDL_Color backgroundColor = {0, 0, 0, 0};
-
-  SDL_Texture *backgroundImage = nullptr;
-
   Display display = Display::Block;
+  Position position = Position::Static;
+  std::string width = "default";
+  std::string height = "default";
+
   VerticalAlignment verticalAlignment = VerticalAlignment::Top;
   HorizontalAlignment horizontalAlignment = HorizontalAlignment::Left;
   FlexDirection flexDirection = FlexDirection::Row;
   int gap = 0;
   bool flex;
 
+  SDL_Texture *backgroundImage = nullptr;
+  SDL_Color backgroundColor = {0, 0, 0, 0};
   std::string topMargin = "default";
   std::string rightMargin = "default";
   std::string bottomMargin = "default";
@@ -35,8 +36,7 @@ public:
 
   float zIndex = 0;
 
-  std::string width = "default";
-  std::string height = "default";
+
 
   std::string top = "default";
   std::string left = "default";
