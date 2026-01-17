@@ -18,6 +18,7 @@ public:
   HorizontalAlignment horizontalAlignment = HorizontalAlignment::Left;
   FlexDirection flexDirection = FlexDirection::Row;
   int gap = 0;
+  bool flex;
 
   std::string topMargin = "";
   std::string rightMargin = "";
@@ -38,5 +39,23 @@ public:
   std::string left = "";
 
   float scale;
+
+  std::string Get(std::string name) {
+    // #region Get
+    if (name == "topMargin") return topMargin;
+    if (name == "rightMargin") return rightMargin;
+    if (name == "bottomMargin") return bottomMargin;
+    if (name == "leftMargin") return leftMargin;
+    if (name == "topPadding") return topPadding;
+    if (name == "rightPadding") return rightPadding;
+    if (name == "bottomPadding") return bottomPadding;
+    if (name == "leftPadding") return leftPadding;
+    if (name == "height") return height;
+    if (name == "width") return width;
+    if (name == "top") return top;
+    if (name == "left") return left;
+    throw std::runtime_error("Unknnown style parameter: " + name);
+    // #endregion
+  }
 };
 } // namespace Chess::Rendering

@@ -1,9 +1,10 @@
 #include "Element.h"
 #include "../../windowManager/WindowManager.h"
+#include "../styles/styleParser/StyleParser.h"
 #include <algorithm>
 #include <iostream>
 #include <string>
-#include <windows.h>
+
 namespace Chess::Rendering {
 
 Element &Element::GetRoot() {
@@ -169,26 +170,65 @@ SDL_FRect Element::GetChildRect(Element *child) {
   // #region GetChildRect
   SDL_FRect myRect = GetRect();
   SDL_FRect childRect = {myRect.x, myRect.y, 0, 0};
-  short childIndex = GetChildIndex(child);
+
+  int topPadding = StyleParser::GetStyleValue(this, "topPadding");
+  int rightPadding = StyleParser::GetStyleValue(this, "rightPadding");
+  int bottomPadding = StyleParser::GetStyleValue(this, "bottomPadding");
+  int leftPadding = StyleParser::GetStyleValue(this, "leftPadding");
+
+  int width = StyleParser::GetStyleValue(child, "width");
+  int height = StyleParser::GetStyleValue(child, "height");
+
+
+  childRect.w = width;
+  childRect.h = height;
 
   if (child->styles.position == Position::Absolute) {
     SDL_FRect relativeParentRect = GetRelativeParent()->GetRect();
+    int left = StyleParser::GetStyleValue(child, "left");
+    int top = StyleParser::GetStyleValue(child, "top");
 
-    // childRect.x = relativeParentRect.x + styles.left + styles.leftMargin;
-    // childRect.y = relativeParentRect.y + styles.top + styles.topMargin;
-
-    // int width = child->styles.width;
-    // width == -1 ? width = relativeParentRect.w : width;
-
-    // int height = child->styles.height;
-    // height == -1 ? height = relativeParentRect.h : height;
+    childRect.x = relativeParentRect.x + left;
+    childRect.y = relativeParentRect.y + top;
 
     return childRect;
   }
 
-  for (size_t i = 0; i < children.size(); i++) {
+
+  short childIndex = GetChildIndex(child);
+  int currentX = 0;
+  int currentY = 0;
+  int rowY;
+  int colX;
+  for (short i = 0; i < childIndex; i++) {
+    int siblingTopMargin = StyleParser::GetStyleValue(children[i].get(), "topMargin");
+    int siblingRightMargin = StyleParser::GetStyleValue(children[i].get(), "rightMargin");
+    int siblingBottomMargin = StyleParser::GetStyleValue(children[i].get(), "bottomMargin");
+    int siblingLeftMargin = StyleParser::GetStyleValue(children[i].get(), "leftMargin");
+    int siblingWidth = StyleParser::GetStyleValue(children[i].get(), "width");
+    int siblingHeight = StyleParser::GetStyleValue(children[i].get(), "height");
+
+    if (styles.flexDirection == FlexDirection::Row) {
+      rowY = std::max(siblingHeight, rowY);
+      currentX += siblingLeftMargin + siblingWidth + siblingRightMargin + styles.gap;
+      if (currentX + width > (myRect.w - (leftPadding + rightPadding))) {
+        currentX = 0;
+        currentY += rowY;
+        rowY = 0;
+      }
+    } else {
+      colX = std::max(siblingWidth, colX);
+      currentY += siblingTopMargin + siblingHeight + siblingBottomMargin + styles.gap;
+      if (currentY + height > (myRect.h - (topPadding + bottomPadding))) {
+        currentY = 0;
+        currentX += colX;
+        colX = 0;
+      }
+    }
   }
 
+  childRect.x = myRect.x + currentX;
+  childRect.y = myRect.y + currentY;
 
   return childRect;
   // #endregion
