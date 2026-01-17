@@ -4,7 +4,7 @@
   "description": "This rrepo contains a ccpp project template for VSCode with a dev pipeline",
   "main": "build.js",
   "scripts": {
-    "dev": "setupEnv.bat && nodemon -q .",
+    "dev": "rm -r build && setupEnv.bat && nodemon -q .",
     "build": "setupEnv.bat && build.bat"
   },
   "repository": {

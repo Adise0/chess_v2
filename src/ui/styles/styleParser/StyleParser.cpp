@@ -1,6 +1,7 @@
 #include "StyleParser.h"
+#include "../../../windowManager/WindowManager.h"
 #include <algorithm>
-#include <stdexcept>
+#include <iostream>
 namespace Chess::Rendering {
 
 int StyleParser::GetStyleValue(Element *element, std::string name) {
@@ -10,29 +11,34 @@ int StyleParser::GetStyleValue(Element *element, std::string name) {
   try {
     short index;
     std::string_view matcher = GetMatcher(value, index);
-    int ammount = 0;
+    if (matcher == "default") return 0;
+    int amount = 0;
 
     if (matcher == "fit-content") {
       for (short i = 0; i < element->children.size(); i++) {
         if (element->children[i]->styles.position != Position::Relative) continue;
-        ammount += GetStyleValue(element->children[i].get(), name);
+        amount += GetStyleValue(element->children[i].get(), name);
       }
-      return ammount;
+      return amount;
     }
 
-    ammount = std::clamp(ammount, 0, std::stoi(value.substr(index)));
-    if (matcher == "px") return ammount;
-    if (matcher == "%") {
 
-      if (GetMatcher(element->parent->styles.Get(name)) == "fit-content") {
+    amount = std::max(std::stoi(value.substr(0, index)), 0);
+    if (matcher == "px") return amount;
+    if (matcher == "%") {
+      std::string parentStr = element->parent->styles.Get(name);
+      if (GetMatcher(parentStr) == "fit-content") {
         // TODO: Add warn:
         // ssize can't be a percentage of fit-content
         return 0;
       }
       int parentValue = GetStyleValue(element->parent, name);
-      return (parentValue * (ammount / 100));
+      std::cout << "Percent detected!: " << amount << std::endl;
+      return (parentValue * (amount / 100));
     }
-
+    if (matcher == "vw") return WindowManager::resolutionX;
+    if (matcher == "vh") return WindowManager::resolutionY;
+    throw std::runtime_error("Unknown matcher: " + std::string(matcher));
   } catch (std::runtime_error e) {
     throw e;
   } catch (...) {
@@ -50,15 +56,17 @@ std::string_view StyleParser::GetMatcher(std::string &value) {
 }
 std::string_view StyleParser::GetMatcher(std::string &value, short &index) {
   // #region GetMatcher
+  if (value == "default") return "default";
+
   std::string_view foundMatcher;
   for (size_t i = 0; i < matchers.size(); i++) {
-    auto it = std::find(value.begin(), value.end(), matchers[i]);
-    if (it == value.end()) continue;
+    size_t foundIndex = value.find(matchers[i]);
+    if (foundIndex == std::string::npos) continue;
     foundMatcher = matchers[i];
-    index = it - value.begin();
+    index = foundIndex;
   }
 
-  if (foundMatcher == NULL) throw std::runtime_error("Can't find matcher in: " + value);
+  if (foundMatcher.empty()) throw std::runtime_error("Can't find matcher in: " + value);
   return foundMatcher;
   // #endregion
 }

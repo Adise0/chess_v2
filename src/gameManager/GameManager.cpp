@@ -16,7 +16,7 @@ MainMenu GameManager::mainMenu = MainMenu();
 void GameManager::Run() {
   // #region Run
   isRunning = true;
-  SDL_Event event;
+  SDL_Event sdlEvent;
   auto lastFrame = std::chrono::high_resolution_clock::now();
 
 
@@ -28,8 +28,8 @@ void GameManager::Run() {
     deltaTime = std::chrono::duration<float>(thisFrame - lastFrame).count();
     lastFrame = thisFrame;
 
-    ProcessEvent(event);
-    Update();
+    ProcessEvent(sdlEvent);
+    // Update();
     Render();
   }
   // #endregion
@@ -38,7 +38,7 @@ void GameManager::Run() {
 
 void GameManager::ProcessEvent(SDL_Event &sdlEvent) {
   // #region ProcessEvent
-  Event event;
+  Event event(sdlEvent);
 
   while (SDL_PollEvent(&sdlEvent)) {
 
@@ -49,7 +49,7 @@ void GameManager::ProcessEvent(SDL_Event &sdlEvent) {
 
     case SDL_EVENT_MOUSE_MOTION:
       event.eventType = EventType::OnMouseMove;
-      Element::GetRoot().HandleEvent(event);
+      // Element::GetRoot().HandleEvent(event);
       break;
 
     default:

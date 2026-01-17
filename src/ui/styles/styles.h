@@ -23,23 +23,23 @@ public:
   int gap = 0;
   bool flex;
 
-  std::string topMargin = "";
-  std::string rightMargin = "";
-  std::string bottomMargin = "";
-  std::string leftMargin = "";
+  std::string topMargin = "default";
+  std::string rightMargin = "default";
+  std::string bottomMargin = "default";
+  std::string leftMargin = "default";
 
-  std::string topPadding = "";
-  std::string rightPadding = "";
-  std::string bottomPadding = "";
-  std::string leftPadding = "";
+  std::string topPadding = "default";
+  std::string rightPadding = "default";
+  std::string bottomPadding = "default";
+  std::string leftPadding = "default";
 
   float zIndex = 0;
 
-  std::string height = "";
-  std::string width = "";
+  std::string width = "default";
+  std::string height = "default";
 
-  std::string top = "";
-  std::string left = "";
+  std::string top = "default";
+  std::string left = "default";
 
   float scale;
 

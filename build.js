@@ -65,13 +65,13 @@ filesToCompile = filesToCompile.filter((filePath) => !filePath.endsWith(".h"));
 
 if (filesToCompile.length != 0) {
   execSync(
-    `cl.exe /Zi /Od /EHsc /nologo /I"lib/include" /std:c++17 /Fobuild/objects/ /Fdbuild/compiler.pdb ${filesToCompile.join(
-      " "
+    `cl.exe /Zi /Od /EHsc /nologo /I"lib/include" /std:c++20 /Fobuild/objects/ /Fdbuild/compiler.pdb ${filesToCompile.join(
+      " ",
     )} /c `,
     {
       stdio: "inherit",
       shell: true,
-    }
+    },
   );
 
   execSync(
@@ -79,7 +79,7 @@ if (filesToCompile.length != 0) {
     {
       stdio: "inherit",
       shell: true,
-    }
+    },
   );
 }
 

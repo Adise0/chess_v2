@@ -13,8 +13,8 @@ int Run() {
 
   std::cout << "Running! \n";
   GameManager::Run();
-  SDL_Quit();
   WindowManager::Dispose();
+  SDL_Quit();
   return EXIT_SUCCESS;
 }
 } // namespace Chess

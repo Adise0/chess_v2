@@ -6,7 +6,7 @@ namespace Chess::Rendering {
 
 class StyleParser {
 private:
-  static inline std::array<std::string_view, 3> matchers{"px", "%", "fit-content"};
+  static inline std::array<std::string_view, 5> matchers{"px", "%", "fit-content", "vw", "vh"};
 
 public:
   static int GetStyleValue(Element *element, std::string name);

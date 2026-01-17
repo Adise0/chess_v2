@@ -7,9 +7,22 @@
 
 namespace Chess::Rendering {
 
+bool Element::isInitialized = false;
+Styles Element::rootStyles{
+    .backgroundColor = {255, 0, 255, 255},
+    .width = "100vw",
+    .height = "100vh",
+};
+
+
 Element &Element::GetRoot() {
   // #region GetRoot
   static Element root("root");
+  if (!isInitialized) {
+    root.styles = rootStyles;
+    isInitialized = true;
+  }
+
   return root;
   // #endregion
 }
@@ -63,12 +76,18 @@ void Element::Render() {
   // #region Render
   if (styles.display == Display::None) return;
 
+  SDL_FRect rect = GetRect();
+  if (id == "MainMenu") {
+    std::cout << "From render: " << rect.x << " " << rect.y << std::endl;
+  }
+
+
   SDL_Color &color = styles.backgroundColor;
   SDL_SetRenderDrawColor(WindowManager::renderer, color.r, color.g, color.b, color.a);
-  SDL_RenderFillRect(WindowManager::renderer, &GetRect());
+  SDL_RenderFillRect(WindowManager::renderer, &rect);
 
   SDL_Texture *texture = styles.backgroundImage;
-  if (texture) SDL_RenderTexture(WindowManager::renderer, texture, NULL, &GetRect());
+  if (texture) SDL_RenderTexture(WindowManager::renderer, texture, NULL, &rect);
 
   std::vector<Element *> elements = GetRenderElements();
   for (Element *element : elements) {
@@ -171,6 +190,7 @@ SDL_FRect Element::GetChildRect(Element *child) {
   SDL_FRect myRect = GetRect();
   SDL_FRect childRect = {myRect.x, myRect.y, 0, 0};
 
+
   int topPadding = StyleParser::GetStyleValue(this, "topPadding");
   int rightPadding = StyleParser::GetStyleValue(this, "rightPadding");
   int bottomPadding = StyleParser::GetStyleValue(this, "bottomPadding");
@@ -179,6 +199,9 @@ SDL_FRect Element::GetChildRect(Element *child) {
   int width = StyleParser::GetStyleValue(child, "width");
   int height = StyleParser::GetStyleValue(child, "height");
 
+  if (child->id == "MainMenu") {
+    std::cout << "Width: " << width << " Height: " << height << std::endl;
+  }
 
   childRect.w = width;
   childRect.h = height;

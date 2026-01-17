@@ -11,6 +11,10 @@ namespace Chess::Rendering {
 using namespace Events;
 class Element {
   // #region Static
+private:
+  static bool isInitialized;
+  static Styles rootStyles;
+
 public:
   static Element &GetRoot();
   // #endregion
