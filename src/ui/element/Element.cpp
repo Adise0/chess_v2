@@ -36,8 +36,48 @@ bool Element::IsElementInFlow(Element *element) {
   // #endregion
 }
 
-SDL_FRect Element::GetDisplayRect(Element *element) { return GetOuterRect(element); }
-SDL_FRect Element::GetInnerRect(Element *element) { return GetOuterRect(element); }
+SDL_FRect Element::GetDisplayRect(Element *element) {
+  // #region GetDisplayRect
+  SDL_FRect outerRect = GetOuterRect(element);
+
+  int topMargin = StyleParser::GetStyleValue(element, "topMargin");
+  int rightMargin = StyleParser::GetStyleValue(element, "rightMargin");
+  int bottomMargin = StyleParser::GetStyleValue(element, "bottomMargin");
+  int leftMargin = StyleParser::GetStyleValue(element, "leftMargin");
+
+  float x = outerRect.x + leftMargin;
+  float y = outerRect.y + topMargin;
+  float w = outerRect.w - rightMargin;
+  float h = outerRect.h - bottomMargin;
+
+  // TODO: Add truncating from overflow, scroll and shi
+
+  return {x, y, w, h};
+  // #endregion
+}
+SDL_FRect Element::GetInnerRect(Element *element) {
+  // #region GetInnerRect
+  SDL_FRect outerRect = GetOuterRect(element);
+
+  int topPadding = StyleParser::GetStyleValue(element, "topPadding");
+  int rightPadding = StyleParser::GetStyleValue(element, "rightPadding");
+  int bottomPadding = StyleParser::GetStyleValue(element, "bottomPadding");
+  int leftPadding = StyleParser::GetStyleValue(element, "leftPadding");
+
+
+  int topMargin = StyleParser::GetStyleValue(element, "topMargin");
+  int rightMargin = StyleParser::GetStyleValue(element, "rightMargin");
+  int bottomMargin = StyleParser::GetStyleValue(element, "bottomMargin");
+  int leftMargin = StyleParser::GetStyleValue(element, "leftMargin");
+
+  float x = outerRect.x + leftMargin + leftPadding;
+  float y = outerRect.y + topMargin + topPadding;
+  float w = outerRect.w - rightPadding - rightPadding;
+  float h = outerRect.h - bottomPadding - bottomPadding;
+
+  return {x, y, w, y};
+  // #endregion
+}
 
 SDL_FRect Element::GetOuterRect(Element *element) {
   // #region GetOuterRect
@@ -47,8 +87,8 @@ SDL_FRect Element::GetOuterRect(Element *element) {
   SDL_FRect parentInnerRect = GetInnerRect(element->parent);
 
   if (element->parent->styles.display == Display::Block) {
-    float y = parentInnerRect.y;
     float x = parentInnerRect.x;
+    float y = parentInnerRect.y;
 
     short siblingIndex = element->GetSiblingIndex();
     for (short i = 0; i < siblingIndex; i++) {
@@ -56,15 +96,17 @@ SDL_FRect Element::GetOuterRect(Element *element) {
       if (!IsElementInFlow(sibling)) continue;
       y += GetOuterRect(sibling).h;
     }
+
     int topMargin = StyleParser::GetStyleValue(element, "topMargin");
+    int rightMargin = StyleParser::GetStyleValue(element, "rightMargin");
+    int bottomMargin = StyleParser::GetStyleValue(element, "bottomMargin");
     int leftMargin = StyleParser::GetStyleValue(element, "leftMargin");
 
     float width = StyleParser::GetStyleValue(element, "width");
     float height = StyleParser::GetStyleValue(element, "height");
 
-    y += topMargin;
-    x += leftMargin;
-
+    width += leftMargin + rightMargin;
+    height += topMargin + bottomMargin;
 
     SDL_FRect rect = {x, y, width, height};
     if (element->parent->styles.overflow == Overflow::Show) return rect;
