@@ -14,13 +14,19 @@ MainMenu::MainMenu() : Screen() {
 
 
   Styles buttonStyles{
-      .width = "100px",
+      .width = "500px",
       .height = "30px",
       .backgroundColor = {0, 0, 0, 255},
   };
   Element *playButton = root->CreateChild("PlayButton");
   playButton->styles = buttonStyles;
-  // playButton->styles.width = "defualt";
-  // playButton->styles.height = 50;
+
+  Styles buttonStyles2{
+      .width = "1000px",
+      .height = "30px",
+      .backgroundColor = {0, 0, 255, 255},
+  };
+  Element *playButton2 = root->CreateChild("PlayButton2");
+  playButton2->styles = buttonStyles2;
 }
 } // namespace Chess::Rendering::Screens

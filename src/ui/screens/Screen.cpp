@@ -5,7 +5,7 @@ namespace Chess::Rendering {
 Screen::Screen() {};
 void Screen::Show() {
   if (!root) throw std::runtime_error("Screen not yet set up");
-  root->styles.display = Display::Flex;
+  root->styles.display = Display::Block;
 }
 
 void Screen::Hide() {

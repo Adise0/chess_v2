@@ -27,6 +27,60 @@ Element &Element::GetRoot() {
   // #endregion
 }
 
+
+bool Element::IsElementInFlow(Element *element) {
+  // #region IsElementInFlow
+  return (element->styles.position == Position::Relative ||
+          element->styles.position == Position::Static) &&
+         element->styles.display != Display::None;
+  // #endregion
+}
+
+SDL_FRect Element::GetDisplayRect(Element *element) { return GetOuterRect(element); }
+SDL_FRect Element::GetInnerRect(Element *element) { return GetOuterRect(element); }
+
+SDL_FRect Element::GetOuterRect(Element *element) {
+  // #region GetOuterRect
+  if (!element->parent)
+    return {0, 0, (float)WindowManager::resolutionX, (float)WindowManager::resolutionY};
+
+  SDL_FRect parentInnerRect = GetInnerRect(element->parent);
+
+  if (element->parent->styles.display == Display::Block) {
+    float y = parentInnerRect.y;
+    float x = parentInnerRect.x;
+
+    short siblingIndex = element->GetSiblingIndex();
+    for (short i = 0; i < siblingIndex; i++) {
+      Element *sibling = element->parent->children[i].get();
+      if (!IsElementInFlow(sibling)) continue;
+      y += GetOuterRect(sibling).h;
+    }
+    int topMargin = StyleParser::GetStyleValue(element, "topMargin");
+    int leftMargin = StyleParser::GetStyleValue(element, "leftMargin");
+
+    float width = StyleParser::GetStyleValue(element, "width");
+    float height = StyleParser::GetStyleValue(element, "height");
+
+    y += topMargin;
+    x += leftMargin;
+
+
+    SDL_FRect rect = {x, y, width, height};
+    if (element->parent->styles.overflow == Overflow::Show) return rect;
+    // TODO: scroll
+
+    if (element->parent->styles.overflow == Overflow::Hidden) {
+      if (!element->parent->IsWithinRect(Vector2(rect.x, rect.y))) {
+        rect.w = 0;
+        rect.h = 0;
+      }
+    }
+    return rect;
+  }
+  // #endregion
+}
+
 Element::Element(std::string id) : id(id) {}
 
 Element::~Element() {}
@@ -96,9 +150,7 @@ void Element::Render() {
 
 SDL_FRect Element::GetRect() {
   // #region GetRect
-  if (!parent) return {0, 0, (float)WindowManager::resolutionX, (float)WindowManager::resolutionY};
-
-  return parent->GetChildRect(this);
+  return GetDisplayRect(this);
   // #endregion
 }
 
@@ -176,77 +228,8 @@ bool Element::IsWithinRect(Vector2 position) {
 
 Element *Element::GetRelativeParent() {
   // #region GetRelativeParent
-  if (!parent || styles.position == Position::Relative) return this;
+  if (!parent || styles.position != Position::Static) return this;
   return parent->GetRelativeParent();
-  // #endregion
-}
-
-SDL_FRect Element::GetChildRect(Element *child) {
-  // #region GetChildRect
-  SDL_FRect myRect = GetRect();
-  SDL_FRect childRect = {myRect.x, myRect.y, 0, 0};
-
-
-  int topPadding = StyleParser::GetStyleValue(this, "topPadding");
-  int rightPadding = StyleParser::GetStyleValue(this, "rightPadding");
-  int bottomPadding = StyleParser::GetStyleValue(this, "bottomPadding");
-  int leftPadding = StyleParser::GetStyleValue(this, "leftPadding");
-
-  int width = StyleParser::GetStyleValue(child, "width");
-  int height = StyleParser::GetStyleValue(child, "height");
-
-
-  childRect.w = width;
-  childRect.h = height;
-
-  if (child->styles.position == Position::Absolute) {
-    SDL_FRect relativeParentRect = GetRelativeParent()->GetRect();
-    int left = StyleParser::GetStyleValue(child, "left");
-    int top = StyleParser::GetStyleValue(child, "top");
-
-    childRect.x = relativeParentRect.x + left;
-    childRect.y = relativeParentRect.y + top;
-
-    return childRect;
-  }
-
-
-  short childIndex = GetChildIndex(child);
-  int currentX = 0;
-  int currentY = 0;
-  int rowY;
-  int colX;
-  for (short i = 0; i < childIndex; i++) {
-    int siblingTopMargin = StyleParser::GetStyleValue(children[i].get(), "topMargin");
-    int siblingRightMargin = StyleParser::GetStyleValue(children[i].get(), "rightMargin");
-    int siblingBottomMargin = StyleParser::GetStyleValue(children[i].get(), "bottomMargin");
-    int siblingLeftMargin = StyleParser::GetStyleValue(children[i].get(), "leftMargin");
-    int siblingWidth = StyleParser::GetStyleValue(children[i].get(), "width");
-    int siblingHeight = StyleParser::GetStyleValue(children[i].get(), "height");
-
-    if (styles.flexDirection == FlexDirection::Row) {
-      rowY = std::max(siblingHeight, rowY);
-      currentX += siblingLeftMargin + siblingWidth + siblingRightMargin + styles.gap;
-      if (currentX + width > (myRect.w - (leftPadding + rightPadding))) {
-        currentX = 0;
-        currentY += rowY;
-        rowY = 0;
-      }
-    } else {
-      colX = std::max(siblingWidth, colX);
-      currentY += siblingTopMargin + siblingHeight + siblingBottomMargin + styles.gap;
-      if (currentY + height > (myRect.h - (topPadding + bottomPadding))) {
-        currentY = 0;
-        currentX += colX;
-        colX = 0;
-      }
-    }
-  }
-
-  childRect.x = myRect.x + currentX;
-  childRect.y = myRect.y + currentY;
-
-  return childRect;
   // #endregion
 }
 

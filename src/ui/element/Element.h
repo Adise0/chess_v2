@@ -17,6 +17,11 @@ private:
 
 public:
   static Element &GetRoot();
+  static SDL_FRect GetDisplayRect(Element *element);
+  static SDL_FRect GetInnerRect(Element *element);
+  static SDL_FRect GetOuterRect(Element *element);
+
+  static bool IsElementInFlow(Element *element);
   // #endregion
 
   // #region Data
@@ -31,6 +36,7 @@ public:
   bool isHovered = false;
   bool isActive = false;
 
+  float scrollPosition = 0;
   // #endregion
 
   // #region Constructors
@@ -46,7 +52,6 @@ public:
   Element *CreateChild(std::string id);
 
   SDL_FRect GetRect();
-  SDL_FRect GetChildRect(Element *child);
 
   short GetSiblingIndex();
   void SetSiblingIndex(short newIndex);

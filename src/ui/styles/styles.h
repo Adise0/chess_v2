@@ -19,6 +19,7 @@ public:
   VerticalAlignment verticalAlignment = VerticalAlignment::Top;
   HorizontalAlignment horizontalAlignment = HorizontalAlignment::Left;
   FlexDirection flexDirection = FlexDirection::Row;
+  Overflow overflow = Overflow::Show;
   int gap = 0;
   bool flex;
 
@@ -36,10 +37,10 @@ public:
 
   float zIndex = 0;
 
-
-
   std::string top = "default";
   std::string left = "default";
+  std::string bottom = "default";
+  std::string right = "default";
 
   float scale;
 
