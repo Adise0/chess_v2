@@ -47,8 +47,8 @@ SDL_FRect Element::GetDisplayRect(Element *element) {
 
   float x = outerRect.x + leftMargin;
   float y = outerRect.y + topMargin;
-  float w = outerRect.w - rightMargin;
-  float h = outerRect.h - bottomMargin;
+  float w = outerRect.w - rightMargin - leftMargin;
+  float h = outerRect.h - bottomMargin - topMargin;
 
   // TODO: Add truncating from overflow, scroll and shi
 
@@ -57,7 +57,7 @@ SDL_FRect Element::GetDisplayRect(Element *element) {
 }
 SDL_FRect Element::GetInnerRect(Element *element) {
   // #region GetInnerRect
-  SDL_FRect outerRect = GetOuterRect(element);
+  SDL_FRect displayRect = GetDisplayRect(element);
 
   int topPadding = StyleParser::GetStyleValue(element, "topPadding");
   int rightPadding = StyleParser::GetStyleValue(element, "rightPadding");
@@ -65,17 +65,12 @@ SDL_FRect Element::GetInnerRect(Element *element) {
   int leftPadding = StyleParser::GetStyleValue(element, "leftPadding");
 
 
-  int topMargin = StyleParser::GetStyleValue(element, "topMargin");
-  int rightMargin = StyleParser::GetStyleValue(element, "rightMargin");
-  int bottomMargin = StyleParser::GetStyleValue(element, "bottomMargin");
-  int leftMargin = StyleParser::GetStyleValue(element, "leftMargin");
+  float x = displayRect.x + leftPadding;
+  float y = displayRect.y + topPadding;
+  float w = displayRect.w - rightPadding - leftPadding;
+  float h = displayRect.h - topPadding - bottomPadding;
 
-  float x = outerRect.x + leftMargin + leftPadding;
-  float y = outerRect.y + topMargin + topPadding;
-  float w = outerRect.w - rightPadding - rightPadding;
-  float h = outerRect.h - bottomPadding - bottomPadding;
-
-  return {x, y, w, y};
+  return {x, y, w, h};
   // #endregion
 }
 
@@ -105,8 +100,15 @@ SDL_FRect Element::GetOuterRect(Element *element) {
     float width = StyleParser::GetStyleValue(element, "width");
     float height = StyleParser::GetStyleValue(element, "height");
 
+    bool isWidthPercent = StyleParser::GetMatcher(element->styles.width) == "%";
+    bool isHeightPercent = StyleParser::GetMatcher(element->styles.height) == "%";
+
+
     width += leftMargin + rightMargin;
     height += topMargin + bottomMargin;
+    if (isWidthPercent) width = std::min(width, parentInnerRect.w);
+    if (isHeightPercent) height = std::min(height, parentInnerRect.h);
+
 
     SDL_FRect rect = {x, y, width, height};
     if (element->parent->styles.overflow == Overflow::Show) return rect;
@@ -177,6 +179,7 @@ void Element::Render() {
   SDL_Color &color = styles.backgroundColor;
   SDL_SetRenderDrawColor(WindowManager::renderer, color.r, color.g, color.b, color.a);
   SDL_RenderFillRect(WindowManager::renderer, &rect);
+
 
   SDL_Texture *texture = styles.backgroundImage;
   if (texture) SDL_RenderTexture(WindowManager::renderer, texture, NULL, &rect);
