@@ -8,9 +8,10 @@
   width: 100px;
   height: 100px;
   background-color: red;
+  padding: 10px 20px 0 10px;
 }
 #t {
-  width: 300px;
+  width: 100%;
   height: 20px;
   background-color: aqua;
 }
