@@ -13,36 +13,38 @@ MainMenu::MainMenu() : Screen() {
   root->styles = rootStyles;
 
 
-  Styles buttonStyles{
-      .width = "500px",
-      .height = "30px",
-      .backgroundColor = {0, 0, 0, 255},
-      .topMargin = "5px",
-      .rightMargin = "10px",
-      .bottomMargin = "10px",
-      .leftMargin = "30px",
-      .topPadding = "1px",
-      .rightPadding = "30px",
-      .bottomPadding = "10px",
-      .leftPadding = "30px",
+  Styles h1{
+      .width = "100px",
+      .height = "100px",
+      .backgroundColor = {255, 0, 0, 255},
   };
-  Element *playButton = root->CreateChild("PlayButton");
-  playButton->styles = buttonStyles;
+  Element *h1e = root->CreateChild("h1");
+  h1e->styles = h1;
 
-  Styles buttonStyles2{
+  Styles h2{
+      .width = "80px",
+      .height = "100px",
+      .backgroundColor = {255, 0, 0, 255},
+  };
+  Element *h2e = root->CreateChild("h2");
+  h2e->styles = h2;
+
+
+  Styles t1{
       .width = "100%",
       .height = "100%",
-      .backgroundColor = {0, 0, 255, 255},
+      .backgroundColor = {0, 255, 81, 255},
   };
-  Element *playButton2 = playButton->CreateChild("PlayButton2");
-  playButton2->styles = buttonStyles2;
+  Element *t1e = h1e->CreateChild("t1e");
+  t1e->styles = t1;
 
-  Styles buttonStyles3{
+
+  Styles t2{
       .width = "100%",
-      .height = "100%",
-      .backgroundColor = {0, 0, 255, 255},
+      .height = "90%",
+      .backgroundColor = {183, 0, 255, 255},
   };
-  Element *playButton3 = root->CreateChild("PlayButton3");
-  playButton3->styles = buttonStyles3;
+  Element *t2e = h1e->CreateChild("t2e");
+  t2e->styles = t2;
 }
 } // namespace Chess::Rendering::Screens
